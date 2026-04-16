@@ -29,6 +29,16 @@
             max-width: 500px;
             width: 90%;
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Wappen Styling */
+        .coat-of-arms {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px #ffcc00);
         }
 
         h1 {
@@ -37,6 +47,7 @@
             letter-spacing: 2px;
             text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
             margin-bottom: 5px;
+            margin-top: 0;
         }
 
         .subtitle {
@@ -116,15 +127,41 @@
 
         #score-display {
             display: none;
-            font-size: 2em;
+            font-size: 1.8em;
             color: #00ff00;
             text-shadow: 0 0 15px #00ff00;
+        }
+        
+        /* YouTube Button Styling */
+        .youtube-btn {
+            display: block;
+            margin-top: 30px;
+            background: #ff0000;
+            color: #fff;
+            padding: 15px;
+            border: 2px solid #ff0000;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            text-decoration: none;
+            box-shadow: 0 0 20px #ff0000;
+            transition: 0.3s;
+        }
+
+        .youtube-btn:hover {
+            background: #cc0000;
+            box-shadow: 0 0 30px #ff0000;
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
     <div class="quiz-container" id="quiz-box">
+        <img src="uri.png" alt="Wappen von Uri" class="coat-of-arms">
+        
         <h1>Urner Quiz</h1>
         <div class="subtitle">Bisch ä Gwaggli oder en echte Uristier?</div>
         
@@ -138,7 +175,7 @@
     </div>
 
     <script>
-        // Hier fügst du deine ganzen Urner Wörter ein
+        // 10 Fragen für das Quiz
         const quizData = [
             {
                 word: "Guxä",
@@ -164,6 +201,31 @@
                 word: "Rääf",
                 options: ["Ein Korallenriff", "Eine bösartige Frau", "Ein Werkzeug"],
                 correctAnswer: 1
+            },
+            {
+                word: "Lachoonigä",
+                options: ["Ein lustiger Witz", "Ein Zugezogener / Nicht-Urner", "Eine Lachmöwe"],
+                correctAnswer: 1
+            },
+            {
+                word: "Beedälä",
+                options: ["Beten gehen", "Ausgelassen tanzen", "Jemandem etwas befehlen"],
+                correctAnswer: 1
+            },
+            {
+                word: "Ä Schwetti Lyt",
+                options: ["Schwache Leute", "Eine grosse Menschenmenge", "Schwatzhafte Leute"],
+                correctAnswer: 1
+            },
+            {
+                word: "Jäwwlä",
+                options: ["Ständig jammern und nörgeln", "Schnell rennen", "Lustig sein"],
+                correctAnswer: 0
+            },
+            {
+                word: "Heegu",
+                options: ["Ein Gartenzaun", "Ein Taschenmesser", "Ein Gruss"],
+                correctAnswer: 1
             }
         ];
 
@@ -177,7 +239,6 @@
         const scoreDisplay = document.getElementById('score-display');
 
         function loadQuestion() {
-            // Reset state
             nextBtn.style.display = 'none';
             optionsContainer.innerHTML = '';
             
@@ -197,7 +258,7 @@
             const correctIndex = quizData[currentQuestionIndex].correctAnswer;
             const allButtons = optionsContainer.children;
 
-            // Disable all buttons after click
+            // Deaktiviere alle Buttons nach dem Klick
             for (let i = 0; i < allButtons.length; i++) {
                 allButtons[i].disabled = true;
                 if (i === correctIndex) {
@@ -205,7 +266,7 @@
                 }
             }
 
-            // Check if selected is wrong
+            // Prüfen, ob die Antwort falsch war
             if (selectedIndex !== correctIndex) {
                 buttonElement.classList.add('wrong');
             } else {
@@ -227,13 +288,31 @@
         function showResult() {
             quizContent.style.display = 'none';
             scoreDisplay.style.display = 'block';
-            scoreDisplay.innerHTML = `Stark!<br>Du hesch ${score} vo ${quizData.length} richtig!`;
             
+            let resultMessage = "";
+            if(score === 10) {
+                resultMessage = "Perfäkt! Du bisch en echte Uristier!";
+            } else if (score >= 6) {
+                resultMessage = "Gar nid mal so lätz!";
+            } else {
+                resultMessage = "Da muesch no chli üebe, du Gwaggli!";
+            }
+
+            scoreDisplay.innerHTML = `Stark!<br>Du hesch ${score} vo ${quizData.length} richtig!<br><span style="font-size: 0.6em; color: #fff;">${resultMessage}</span>`;
+            
+            // YouTube Button erstellen
+            const ytBtn = document.createElement('a');
+            ytBtn.href = "https://www.youtube.com/@remosmiles";
+            ytBtn.target = "_blank"; // Öffnet in neuem Tab
+            ytBtn.innerText = "📺 Zu mim YouTube Kanal";
+            ytBtn.classList.add('youtube-btn');
+            scoreDisplay.appendChild(ytBtn);
+
             // Optional: Button zum Neustarten
             const restartBtn = document.createElement('button');
-            restartBtn.innerText = "Nomol probiere";
+            restartBtn.innerText = "↻ Nomol probiere";
             restartBtn.classList.add('option-btn');
-            restartBtn.style.marginTop = "20px";
+            restartBtn.style.marginTop = "15px";
             restartBtn.onclick = () => location.reload();
             scoreDisplay.appendChild(restartBtn);
         }
