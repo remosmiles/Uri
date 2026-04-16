@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S' ultimativä Urner Quiz</title>
+    <style>
+        /* Neon & Urnerstyle (Gelb/Schwarz) Basis */
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Der leuchtende Container */
+        .quiz-container {
+            background: #111111;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5), inset 0 0 15px rgba(255, 204, 0, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            color: #ffcc00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        #word-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Neon Buttons */
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid #ffcc00;
+            color: #ffcc00;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 204, 0, 0.1);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+        }
+
+        /* Richtig / Falsch Status */
+        .correct {
+            background: #00ff00 !important;
+            border-color: #00ff00 !important;
+            color: #000 !important;
+            box-shadow: 0 0 20px #00ff00 !important;
+        }
+
+        .wrong {
+            background: #ff0000 !important;
+            border-color: #ff0000 !important;
+            color: #fff !important;
+            box-shadow: 0 0 20px #ff0000 !important;
+        }
+
+        /* Weiter-Button */
+        #next-btn {
+            display: none;
+            margin-top: 25px;
+            background: #ffcc00;
+            color: #000;
+            padding: 12px 25px;
+            border: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px #ffcc00;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        #next-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 25px #fff;
+        }
+
+        #score-display {
+            display: none;
+            font-size: 2em;
+            color: #00ff00;
+            text-shadow: 0 0 15px #00ff00;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container" id="quiz-box">
+        <h1>Urner Quiz</h1>
+        <div class="subtitle">Bisch ä Gwaggli oder en echte Uristier?</div>
+        
+        <div id="quiz-content">
+            <div id="word-display">Wort ladet...</div>
+            <div id="options-container"></div>
+            <button id="next-btn" onclick="nextQuestion()">Wyter zum nöchste Wort ➔</button>
+        </div>
+
+        <div id="score-display"></div>
+    </div>
+
+    <script>
+        // Hier fügst du deine ganzen Urner Wörter ein
+        const quizData = [
+            {
+                word: "Guxä",
+                options: ["Ein heftiger Schneesturm", "Ein Insekt", "Aus dem Fenster schauen"],
+                correctAnswer: 0
+            },
+            {
+                word: "Gwaggli",
+                options: ["Ein Wackelpudding", "Ein naiver Tollpatsch", "Eine Ente"],
+                correctAnswer: 1
+            },
+            {
+                word: "im Tigu stah",
+                options: ["Im Wald stehen", "Im Regen stehen", "Jemandem im Weg stehen"],
+                correctAnswer: 2
+            },
+            {
+                word: "Schpiägelroor",
+                options: ["Ein Fernglas", "Ein Schminkspiegel", "Ein Abflussrohr"],
+                correctAnswer: 0
+            },
+            {
+                word: "Rääf",
+                options: ["Ein Korallenriff", "Eine bösartige Frau", "Ein Werkzeug"],
+                correctAnswer: 1
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const wordDisplay = document.getElementById('word-display');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const quizContent = document.getElementById('quiz-content');
+        const scoreDisplay = document.getElementById('score-display');
+
+        function loadQuestion() {
+            // Reset state
+            nextBtn.style.display = 'none';
+            optionsContainer.innerHTML = '';
+            
+            const currentData = quizData[currentQuestionIndex];
+            wordDisplay.innerText = currentData.word;
+
+            currentData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option-btn');
+                button.onclick = () => selectAnswer(index, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedIndex, buttonElement) {
+            const correctIndex = quizData[currentQuestionIndex].correctAnswer;
+            const allButtons = optionsContainer.children;
+
+            // Disable all buttons after click
+            for (let i = 0; i < allButtons.length; i++) {
+                allButtons[i].disabled = true;
+                if (i === correctIndex) {
+                    allButtons[i].classList.add('correct');
+                }
+            }
+
+            // Check if selected is wrong
+            if (selectedIndex !== correctIndex) {
+                buttonElement.classList.add('wrong');
+            } else {
+                score++;
+            }
+
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            quizContent.style.display = 'none';
+            scoreDisplay.style.display = 'block';
+            scoreDisplay.innerHTML = `Stark!<br>Du hesch ${score} vo ${quizData.length} richtig!`;
+            
+            // Optional: Button zum Neustarten
+            const restartBtn = document.createElement('button');
+            restartBtn.innerText = "Nomol probiere";
+            restartBtn.classList.add('option-btn');
+            restartBtn.style.marginTop = "20px";
+            restartBtn.onclick = () => location.reload();
+            scoreDisplay.appendChild(restartBtn);
+        }
+
+        // Starte das Quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
