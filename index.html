@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S' ultimativä Urner Quiz</title>
+    
+    <script>
+      window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+
     <style>
         /* Neon & Urnerstyle (Gelb/Schwarz) Basis */
         body {
@@ -175,58 +181,17 @@
     </div>
 
     <script>
-        // 10 Fragen für das Quiz
         const quizData = [
-            {
-                word: "Guxä",
-                options: ["Ein heftiger Schneesturm", "Ein Insekt", "Aus dem Fenster schauen"],
-                correctAnswer: 0
-            },
-            {
-                word: "Gwaggli",
-                options: ["Ein Wackelpudding", "Ein naiver Tollpatsch", "Eine Ente"],
-                correctAnswer: 1
-            },
-            {
-                word: "im Tigu stah",
-                options: ["Im Wald stehen", "Im Regen stehen", "Jemandem im Weg stehen"],
-                correctAnswer: 2
-            },
-            {
-                word: "Schpiägelroor",
-                options: ["Ein Fernglas", "Ein Schminkspiegel", "Ein Abflussrohr"],
-                correctAnswer: 0
-            },
-            {
-                word: "Rääf",
-                options: ["Ein Korallenriff", "Eine bösartige Frau", "Ein Werkzeug"],
-                correctAnswer: 1
-            },
-            {
-                word: "Lachoonigä",
-                options: ["Ein lustiger Witz", "Ein Zugezogener / Nicht-Urner", "Eine Lachmöwe"],
-                correctAnswer: 1
-            },
-            {
-                word: "Beedälä",
-                options: ["Beten gehen", "Ausgelassen tanzen", "Jemandem etwas befehlen"],
-                correctAnswer: 1
-            },
-            {
-                word: "Ä Schwetti Lyt",
-                options: ["Schwache Leute", "Eine grosse Menschenmenge", "Schwatzhafte Leute"],
-                correctAnswer: 1
-            },
-            {
-                word: "Jäwwlä",
-                options: ["Ständig jammern und nörgeln", "Schnell rennen", "Lustig sein"],
-                correctAnswer: 0
-            },
-            {
-                word: "Heegu",
-                options: ["Ein Gartenzaun", "Ein Taschenmesser", "Ein Gruss"],
-                correctAnswer: 1
-            }
+            { word: "Guxä", options: ["Ein heftiger Schneesturm", "Ein Insekt", "Aus dem Fenster schauen"], correctAnswer: 0 },
+            { word: "Gwaggli", options: ["Ein Wackelpudding", "Ein naiver Tollpatsch", "Eine Ente"], correctAnswer: 1 },
+            { word: "im Tigu stah", options: ["Im Wald stehen", "Im Regen stehen", "Jemandem im Weg stehen"], correctAnswer: 2 },
+            { word: "Schpiägelroor", options: ["Ein Fernglas", "Ein Schminkspiegel", "Ein Abflussrohr"], correctAnswer: 0 },
+            { word: "Rääf", options: ["Ein Korallenriff", "Eine bösartige Frau", "Ein Werkzeug"], correctAnswer: 1 },
+            { word: "Lachoonigä", options: ["Ein lustiger Witz", "Ein Zugezogener / Nicht-Urner", "Eine Lachmöwe"], correctAnswer: 1 },
+            { word: "Beedälä", options: ["Beten gehen", "Ausgelassen tanzen", "Jemandem etwas befehlen"], correctAnswer: 1 },
+            { word: "Ä Schwetti Lyt", options: ["Schwache Leute", "Eine grosse Menschenmenge", "Schwatzhafte Leute"], correctAnswer: 1 },
+            { word: "Jäwwlä", options: ["Ständig jammern und nörgeln", "Schnell rennen", "Lustig sein"], correctAnswer: 0 },
+            { word: "Heegu", options: ["Ein Gartenzaun", "Ein Taschenmesser", "Ein Gruss"], correctAnswer: 1 }
         ];
 
         let currentQuestionIndex = 0;
@@ -258,7 +223,6 @@
             const correctIndex = quizData[currentQuestionIndex].correctAnswer;
             const allButtons = optionsContainer.children;
 
-            // Deaktiviere alle Buttons nach dem Klick
             for (let i = 0; i < allButtons.length; i++) {
                 allButtons[i].disabled = true;
                 if (i === correctIndex) {
@@ -266,7 +230,6 @@
                 }
             }
 
-            // Prüfen, ob die Antwort falsch war
             if (selectedIndex !== correctIndex) {
                 buttonElement.classList.add('wrong');
             } else {
@@ -300,15 +263,18 @@
 
             scoreDisplay.innerHTML = `Stark!<br>Du hesch ${score} vo ${quizData.length} richtig!<br><span style="font-size: 0.6em; color: #fff;">${resultMessage}</span>`;
             
-            // YouTube Button erstellen
+            // Sende Statistik an Vercel, dass jemand das Quiz beendet hat
+            if (typeof va !== 'undefined') {
+                va('event', { name: 'Quiz_Beendet', data: { punkte: score } });
+            }
+            
             const ytBtn = document.createElement('a');
             ytBtn.href = "https://www.youtube.com/@remosmiles";
-            ytBtn.target = "_blank"; // Öffnet in neuem Tab
+            ytBtn.target = "_blank";
             ytBtn.innerText = "📺 Zu mim YouTube Kanal";
             ytBtn.classList.add('youtube-btn');
             scoreDisplay.appendChild(ytBtn);
 
-            // Optional: Button zum Neustarten
             const restartBtn = document.createElement('button');
             restartBtn.innerText = "↻ Nomol probiere";
             restartBtn.classList.add('option-btn');
@@ -317,7 +283,6 @@
             scoreDisplay.appendChild(restartBtn);
         }
 
-        // Starte das Quiz
         loadQuestion();
     </script>
 </body>
